@@ -10,13 +10,13 @@ import scala.concurrent.ExecutionContext
   */
 class SubscriptionDao(db: Database) {
 
-  class FeaturesNew(tag: Tag) extends Table[(String, String)](tag, "subscriptions") {
-    def companyName = column[String]("company_name")
-    def creatorName = column[String]("creator")
-    def * = (companyName, creatorName)
-  }
+//  class FeaturesNew(tag: Tag) extends Table[(String, String)](tag, "subscriptions") {
+//    def companyName = column[String]("company_name")
+//    def creatorName = column[String]("creator")
+//    def * = (companyName, creatorName)
+//  }
 
-  val subscriptionsTable = TableQuery[FeaturesNew]
+//  val subscriptionsTable = TableQuery[FeaturesNew]
 
   def createSubscription(order: SubscriptionOrder)(implicit ec: ExecutionContext) = {
 //    val runInsertion = db.run(
@@ -30,7 +30,7 @@ class SubscriptionDao(db: Database) {
     db.run(
       sql"""
          INSERT INTO public.subscriptions (company_name, creator)
-         VALUES (#${order.company.name}, #${order.creator.lastName})
+         VALUES ('#${order.company.name}', '#${order.creator.lastName}')
          RETURNING account_identifier;
          """.as[String]
     ) map(_.head)
