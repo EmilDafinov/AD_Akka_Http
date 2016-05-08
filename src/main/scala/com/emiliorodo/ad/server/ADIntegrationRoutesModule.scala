@@ -36,12 +36,12 @@ trait ADIntegrationRoutesModule extends StrictLogging {
   (pathPrefix("subscription") & parameter("eventUrl") & get) { eventUrl =>
     path("order") {
       complete {
+
         //TODO: Remove the second argument, it is there to ensure a mock response is generated for the call
-        val futureOrder = subscriptionEventDao.getSubscriptionOrder(eventUrl, subscriptionEventDao.mockResponseResolver)
-        val processedOrderAccountId = futureOrder map { subscriptionOrder =>
-          val accountIdentifier = "dummyAccountId" //TODO: insert a real service call here
-          Option(accountIdentifier)
-        }
+        val processedOrderAccountId = for {
+          subscriptionOrder <- subscriptionEventDao.getSubscriptionOrder(eventUrl, subscriptionEventDao.mockResponseResolver)
+          accountIdentifier <- subscriptionDao.createSubscription(subscriptionOrder)
+        } yield Option(accountIdentifier)
         processedOrderAccountId map toSuccessfulNonInteractiveResponse("Account creation successful")
       }
     } ~

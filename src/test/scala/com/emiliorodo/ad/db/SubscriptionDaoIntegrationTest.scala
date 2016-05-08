@@ -15,7 +15,7 @@ class SubscriptionDaoIntegrationTest extends UnitTestSpec {
 
   behavior of "SubscriptionDaoIntegrationTest"
 
-  it should "createSubscription" in {
+  ignore should "createSubscription" in {
     //Given
     val ac = new ApplicationContext {}
 

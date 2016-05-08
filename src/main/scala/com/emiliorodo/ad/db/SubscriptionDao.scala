@@ -10,23 +10,7 @@ import scala.concurrent.ExecutionContext
   */
 class SubscriptionDao(db: Database) {
 
-//  class FeaturesNew(tag: Tag) extends Table[(String, String)](tag, "subscriptions") {
-//    def companyName = column[String]("company_name")
-//    def creatorName = column[String]("creator")
-//    def * = (companyName, creatorName)
-//  }
-
-//  val subscriptionsTable = TableQuery[FeaturesNew]
-
   def createSubscription(order: SubscriptionOrder)(implicit ec: ExecutionContext) = {
-//    val runInsertion = db.run(
-//      DBIO.seq(
-//        subscriptionsTable ++= Seq(
-//          (order.company.name, order.creator.lastName),
-//          sql"SELECT account_identifier FROM public.subscriptions WHERE company_name = #$order.comany"
-//        )
-//      )
-//    )
     db.run(
       sql"""
          INSERT INTO public.subscriptions (company_name, creator)
