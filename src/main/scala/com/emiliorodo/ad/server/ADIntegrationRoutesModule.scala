@@ -39,7 +39,7 @@ trait ADIntegrationRoutesModule extends StrictLogging {
 
         //TODO: Remove the second argument, it is there to ensure a mock response is generated for the call
         val processedOrderAccountId = for {
-          subscriptionOrder <- subscriptionEventDao.getSubscriptionOrder(eventUrl, subscriptionEventDao.mockResponseResolver)
+          subscriptionOrder <- subscriptionEventDao.getSubscriptionOrderEvent(eventUrl, subscriptionEventDao.mockSubscriptionOrderResponseResolver)
           accountIdentifier <- subscriptionDao.createSubscription(subscriptionOrder)
         } yield Option(accountIdentifier)
         processedOrderAccountId map toSuccessfulNonInteractiveResponse("Account creation successful")
@@ -47,7 +47,11 @@ trait ADIntegrationRoutesModule extends StrictLogging {
     } ~
     path("cancel") {
       complete {
-        "Subscription Cancelled"
+        val resp = for {
+          accountIdToCancel <- subscriptionEventDao.getCancelSubscriptionEvent(eventUrl, subscriptionEventDao.mockCancellSubscriptionResponseResolver)
+          cancelledSubscriptionId <- subscriptionDao.cancelSubscription(accountIdToCancel)
+        } yield None
+        resp map toSuccessfulNonInteractiveResponse("Subscription Cancelled")
       }
     } ~
     path("change") {

@@ -31,5 +31,6 @@ CREATE UNIQUE INDEX subscriptions_account_identifier_uindex ON public.subscripti
 psql -d ad_db --username "$POSTGRES_USER" -c "GRANT SELECT ON TABLE public.test_table TO _testuser;"
 psql -d ad_db --username "$POSTGRES_USER" -c "GRANT SELECT ON TABLE public.subscriptions TO _testuser;"
 psql -d ad_db --username "$POSTGRES_USER" -c "GRANT INSERT ON TABLE public.subscriptions TO _testuser;"
+psql -d ad_db --username "$POSTGRES_USER" -c "GRANT DELETE ON TABLE public.subscriptions TO _testuser;"
 psql -d ad_db --username "$POSTGRES_USER" -c "GRANT USAGE, SELECT ON SEQUENCE subscriptions_account_identifier_seq TO _testuser;"
 

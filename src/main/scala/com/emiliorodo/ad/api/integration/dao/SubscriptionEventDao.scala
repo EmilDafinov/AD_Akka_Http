@@ -1,8 +1,8 @@
 package com.emiliorodo.ad.api.integration.dao
 
+import com.emiliorodo.ad.readResourceFile
 import oauth.signpost.basic.DefaultOAuthConsumer
 import dispatch._
-import java.net.URL
 
 import scala.concurrent.ExecutionContext
 import scala.xml.XML
@@ -12,56 +12,32 @@ import scala.xml.XML
   */
 class SubscriptionEventDao(consumerKey: String, consumerSecret: String)(implicit ec: ExecutionContext) {
 
-  val mockResponseResolver: String => Future[String] = {
+  val mockSubscriptionOrderResponseResolver: String => Future[String] = {
     url => Future {
-      <event>
-        <type>SUBSCRIPTION_ORDER</type>
-        <marketplace>
-          <partner>ACME</partner>
-          <baseUrl>https://www.acme-marketplace.com</baseUrl>
-        </marketplace>
-        <creator>
-          <email>andysen@gmail.com</email>
-          <firstName>Andy</firstName>
-          <lastName>Sen</lastName>
-          <openId>https://www.acme-marketplace.com/openid/id/a11a7918-bb43-4429-a256-f6d729c71033</openId>
-          <language>en</language>
-        </creator>
-        <payload>
-          <company>
-            <uuid>d15bb36e-5fb5-11e0-8c3c-00262d2cda03</uuid>
-            <email>admin@example.com</email>
-            <name>Example Company</name>
-            <phoneNumber>1-415-555-1212</phoneNumber>
-            <website>www.appdirect.com</website>
-          </company>
-          <order>
-            <editionCode>BASIC</editionCode>
-            <item>
-              <quantity>10</quantity>
-              <unit>USER</unit>
-            </item>
-            <item>
-              <quantity>15</quantity>
-              <unit>MEGABYTE</unit>
-            </item>
-          </order>
-        </payload>
-      </event>.toString
+      readResourceFile("/mockADResponses/MockSubscriptionOrder.xml")
     }
   }
 
-  def getSubscriptionOrder(eventUrl: String,
-                           resolveRequest: String => Future[String] = eventUrl => Http(url(eventUrl).GET OK as.String))
+  val mockCancellSubscriptionResponseResolver: String => Future[String] = {
+    url => Future {
+      readResourceFile("/mockADResponses/MockCancelSubscription.xml")
+    }
+  }
+
+  def getSubscriptionOrderEvent(eventUrl: String,
+                                resolveRequest: String => Future[String] = eventUrl => Http(url(eventUrl).GET OK as.String))
   : Future[SubscriptionOrder] = {
 
-    new URL(eventUrl)
+
+    resolveRequest(signed(eventUrl)) map toParsedSubscriptionOrder
+  }
+
+  private def signed(eventUrl: String): String = {
     val signedUrl = new DefaultOAuthConsumer(
       consumerKey,
       consumerSecret
     ).sign(eventUrl)
-
-    resolveRequest(signedUrl) map toParsedSubscriptionOrder
+    signedUrl
   }
 
   private def toParsedSubscriptionOrder(responseBody: String): SubscriptionOrder = {
@@ -86,6 +62,17 @@ class SubscriptionEventDao(consumerKey: String, consumerSecret: String)(implicit
       )
     }
     SubscriptionOrder(company, creator, items)
+  }
+
+  def getCancelSubscriptionEvent(eventUrl: String,
+                                 resolveRequest: String => Future[String] = eventUrl => Http(url(eventUrl).GET OK as.String)) = {
+
+    resolveRequest(signed(eventUrl)) map toParsedAccountIdentifier
+  }
+
+  private def toParsedAccountIdentifier(responseBody: String): String = {
+    val accountIdentifierElement = XML.loadString(responseBody) \ "payload" \ "account" \ "accountIdentifier"
+    accountIdentifierElement.text
   }
 }
 

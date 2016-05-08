@@ -5,7 +5,7 @@ import com.emiliorodo.ad.util.UnitTestSpec
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import scala.io.Source
+import com.emiliorodo.ad.readResourceFile
 import scala.language.postfixOps
 /**
   * @author edafinov
@@ -13,21 +13,21 @@ import scala.language.postfixOps
 class SubscriptionEventDaoTest extends UnitTestSpec {
   behavior of "SubscriptionDao"
 
-  def readTestResource(testResource: String): String = {
-    Source.fromURL(getClass.getResource(testResource)) mkString
-  }
+//  def readResourceFile(testResource: String): String = {
+//    Source.fromURL(getClass.getResource(testResource)) mkString
+//  }
 
   val testedSubscriptionDao = new SubscriptionEventDao(consumerKey = "dummyKey", consumerSecret = "dummySecret")
 
   it should "parse the order correctly" in  {
 
     //Given
-    val mockResponse = readTestResource("/SubscriptionOrder.xml")
+    val mockResponse = readResourceFile("/SubscriptionOrder.xml")
     val mockResponseResolver: String => Future[String] = {_ => Future{mockResponse}}
 
     //When
     val order = Await.result(
-      testedSubscriptionDao.getSubscriptionOrder("mockUrl", mockResponseResolver),
+      testedSubscriptionDao.getSubscriptionOrderEvent("mockUrl", mockResponseResolver),
       Duration.Inf
     )
 
