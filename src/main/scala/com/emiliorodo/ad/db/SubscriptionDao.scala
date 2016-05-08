@@ -1,7 +1,7 @@
 package com.emiliorodo.ad.db
 
-import com.emiliorodo.ad.api.{ADApiException, UserAlreadyExists, UserNotFound}
 import com.emiliorodo.ad.api.integration.dao.SubscriptionOrder
+import com.emiliorodo.ad.api.{ADApiException, AccountNotFound, UserAlreadyExists}
 import com.typesafe.scalalogging.StrictLogging
 import org.postgresql.util.PSQLException
 import slick.driver.PostgresDriver.api._
@@ -33,7 +33,7 @@ class SubscriptionDao(db: Database) extends StrictLogging {
     ) map { deletedRecords =>
       if (deletedRecords == 0)
         throw new ADApiException(
-          errorCode = UserNotFound,
+          errorCode = AccountNotFound,
           errorMessage = "The subscription's account Identifier was not found"
         )
       deletedRecords

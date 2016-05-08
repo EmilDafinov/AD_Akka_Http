@@ -7,8 +7,7 @@ import com.google.common.base.CaseFormat
   * @author edafinov
   */
 
-case class ADApiException(
-                           private val errorCode: ErrorCode = UnknownError,
+case class ADApiException( private val errorCode: ErrorCode = UnknownError,
                            errorMessage: String = "An unknown error has occurred") extends Exception(errorMessage) {
   def getErrorCode = errorCode.errorCodeString
 }
