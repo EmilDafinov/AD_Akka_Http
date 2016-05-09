@@ -1,7 +1,7 @@
 package com.emiliorodo.ad.api.integration.dao
 
 import com.emiliorodo.ad.readResourceFile
-import oauth.signpost.basic.DefaultOAuthConsumer
+import com.emiliorodo.ad.security.OAuthTool
 import dispatch._
 
 import scala.concurrent.ExecutionContext
@@ -10,7 +10,7 @@ import scala.xml.XML
 /**
   * @author edafinov
   */
-class SubscriptionEventDao(consumerKey: String, consumerSecret: String)(implicit ec: ExecutionContext) {
+class SubscriptionEventDao(signer: OAuthTool)(implicit ec: ExecutionContext) {
 
   val mockSubscriptionOrderResponseResolver: String => Future[String] = {
     url => Future {
@@ -18,7 +18,7 @@ class SubscriptionEventDao(consumerKey: String, consumerSecret: String)(implicit
     }
   }
 
-  val mockCancellSubscriptionResponseResolver: String => Future[String] = {
+  val mockCancelSubscriptionResponseResolver: String => Future[String] = {
     url => Future {
       readResourceFile("/mockADResponses/MockCancelSubscription.xml")
     }
@@ -28,16 +28,8 @@ class SubscriptionEventDao(consumerKey: String, consumerSecret: String)(implicit
                                 resolveRequest: String => Future[String] = eventUrl => Http(url(eventUrl).GET OK as.String))
   : Future[SubscriptionOrder] = {
 
-
-    resolveRequest(signed(eventUrl)) map toParsedSubscriptionOrder
-  }
-
-  private def signed(eventUrl: String): String = {
-    val signedUrl = new DefaultOAuthConsumer(
-      consumerKey,
-      consumerSecret
-    ).sign(eventUrl)
-    signedUrl
+    val signedUrl = signer.sign(eventUrl)
+    resolveRequest(signedUrl) map toParsedSubscriptionOrder
   }
 
   private def toParsedSubscriptionOrder(responseBody: String): SubscriptionOrder = {
@@ -67,7 +59,8 @@ class SubscriptionEventDao(consumerKey: String, consumerSecret: String)(implicit
   def getCancelSubscriptionEvent(eventUrl: String,
                                  resolveRequest: String => Future[String] = eventUrl => Http(url(eventUrl).GET OK as.String)) = {
 
-    resolveRequest(signed(eventUrl)) map toParsedAccountIdentifier
+    val signedUrl = signer.sign(eventUrl)
+    resolveRequest(signedUrl) map toParsedAccountIdentifier
   }
 
   private def toParsedAccountIdentifier(responseBody: String): String = {

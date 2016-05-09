@@ -24,6 +24,5 @@ trait MainRoutesModule {
   val baseRoute: Route =
     staticContentRoute ~
     testRoute ~
-    adIntegrationRoutesBase
-
+    adIntegrationRoutes
 }

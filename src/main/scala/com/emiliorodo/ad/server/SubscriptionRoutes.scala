@@ -38,7 +38,7 @@ trait SubscriptionRoutes {
       complete {
         val resp = for {
         //TODO: Remove the second argument, it is there to ensure a mock response is generated for the call
-          accountIdToCancel <- subscriptionEventDao.getCancelSubscriptionEvent(eventUrl, subscriptionEventDao.mockCancellSubscriptionResponseResolver)
+          accountIdToCancel <- subscriptionEventDao.getCancelSubscriptionEvent(eventUrl, subscriptionEventDao.mockCancelSubscriptionResponseResolver)
           cancelledSubscriptionId <- subscriptionDao.cancelSubscription(accountIdToCancel)
         } yield None
         resp map SuccessfulNonInteractiveResponse("Subscription Cancelled")

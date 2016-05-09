@@ -6,6 +6,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import com.emiliorodo.ad.readResourceFile
+import com.emiliorodo.ad.security.OAuthTool
+
 import scala.language.postfixOps
 /**
   * @author edafinov
@@ -13,11 +15,8 @@ import scala.language.postfixOps
 class SubscriptionEventDaoTest extends UnitTestSpec {
   behavior of "SubscriptionDao"
 
-//  def readResourceFile(testResource: String): String = {
-//    Source.fromURL(getClass.getResource(testResource)) mkString
-//  }
-
-  val testedSubscriptionDao = new SubscriptionEventDao(consumerKey = "dummyKey", consumerSecret = "dummySecret")
+  val mockSigner = mock[OAuthTool]
+  val testedSubscriptionDao = new SubscriptionEventDao(mockSigner)
 
   it should "parse the order correctly" in  {
 

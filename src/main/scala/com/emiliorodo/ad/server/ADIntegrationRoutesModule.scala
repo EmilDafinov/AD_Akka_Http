@@ -8,17 +8,18 @@ import com.emiliorodo.ad.api.ADApiException
 import com.emiliorodo.ad.api.integration.dao.SubscriptionDaoModule
 import com.emiliorodo.ad.db.DatabaseModule
 import com.typesafe.scalalogging.StrictLogging
-
 /**
   * @author edafinov
   */
-trait ADIntegrationRoutesModule extends StrictLogging with SubscriptionRoutes {
+trait ADIntegrationRoutesModule extends StrictLogging with SubscriptionRoutes with UserAssignmentRoutes {
   this: SubscriptionDaoModule with AkkaDependenciesModule with DatabaseModule =>
 
-  lazy val adIntegrationRoutesBase: Route =
+  lazy val adIntegrationRoutes: Route =
     handleExceptions(adIntegrationRoutesErrorHandler) {
+
       pathPrefix("ad" / "events") {
-        subscriptionEventsRoutes
+        subscriptionEventsRoutes ~
+        userAssignmentRoutes
       }
     }
 

@@ -19,10 +19,12 @@ trait ApplicationContext extends StrictLogging
   with DatabaseModule
   with ADIntegrationRoutesModule
   with MainRoutesModule
-  with HttpServerModule
 
 object Main extends App
   with ApplicationContext {
+
+  lazy val serverInterface = config.getString("http.server.interface")
+  lazy val serverPort = config.getInt("http.server.port")
 
   Http()
     .bindAndHandle(
