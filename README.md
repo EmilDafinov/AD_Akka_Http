@@ -89,6 +89,19 @@ The application configuration can be found in
 Many aspects of the application can be configured there. 
 Read the comments in that file for more information.
 
+UI
+---
+When running, the app serves its static content from the
+
+```
+/resources/webapp
+```
+directory. You can access it from your browser by going to:
+```
+{applicationHost}:{applicationPort}
+```
+
+It currently is a "Hello World" UI using AngularJS.
 
 AppDirect event routes
 ----------------------
