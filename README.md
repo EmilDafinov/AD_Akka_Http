@@ -18,10 +18,35 @@ I would recommend Homebrew
 ```
 brew install sbt
 ```
+If you are not using OS X, use whichever is the most popular package
+manager for your UNIX distribution (apt-get for Debian/Ubuntu, yum for CentOS/Fedora/RedHat, etc)
 
 The build is configured in the ```build.sbt``` file found in the root
 directory of the project
 
+Packaging
+---------
+The application is packaged as a runnable fat jar using the sbt-assembly 
+plugin. The class containing the applicaiton's main method, as well as 
+the name and location of the output jar can be configured in build.sbt
+
+Run
+```
+sbt assembly
+```
+in the root directory of the project. This will package the application, 
+along with all resources and dependencies into a single runnable .jar
+file. Look ath the console output to see where the jar is located.
+
+Running the application
+-----------------------
+
+You can run the application by simply running the jar you have obtained during the
+previous step:
+
+```
+java -jar <name-of-packaged-jar>
+```
 
 Data store
 ----------
@@ -53,6 +78,8 @@ would give the IP of your docker VM.
 The db would be running on port 32771. However you can map it to a different
 port if you'd like.
 
+See initdb.sh if you would like to know how the db is configured.
+
 Configuration
 -------------
 The application configuration can be found in 
@@ -62,28 +89,6 @@ The application configuration can be found in
 Many aspects of the application can be configured there. 
 Read the comments in that file for more information.
 
-Packaging
----------
-The application is packaged as a runnable fat jar using the sbt-assembly 
-plugin. The class containing the applicaiton's main method, as well as 
-the name and location of the output jar can be configured in build.sbt
-
-```
-sbt assembly
-```
-in the root directory of the project. This will package the application, 
-along with all resources and dependencies into a single runnable .jar
-file. Look ath the console output to see where the jar is located.
-
-Running the application
------------------------
-
-You can run the application by simply running the jar you have obtained during the
-previous step:
-
-```
-java -jar <name-of-packaged-jar>
-```
 
 AppDirect event routes
 ----------------------

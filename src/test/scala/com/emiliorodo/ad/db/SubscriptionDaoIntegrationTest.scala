@@ -9,13 +9,14 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
+  * Test that is meant to be executed manually
   * @author edafinov
   */
 class SubscriptionDaoIntegrationTest extends UnitTestSpec {
 
   behavior of "SubscriptionDaoIntegrationTest"
 
-  ignore should "createSubscription" in {
+  ignore should "create a subscription" in {
     //Given
     val ac = new ApplicationContext {}
 
@@ -32,7 +33,7 @@ class SubscriptionDaoIntegrationTest extends UnitTestSpec {
     )
     //When
     val resultFuture = testedDao.createSubscription(mockOrder)
-    val result = Await.result(resultFuture, Duration.Inf)
+    Await.result(resultFuture, Duration.Inf)
 
     //Then
     val a = 5
