@@ -84,3 +84,17 @@ previous step:
 ```
 java -jar <name-of-packaged-jar>
 ```
+
+AppDirect event routes
+----------------------
+
+The rest interface of the application supports the SUBSCRIPTION_ORDER
+and SUBSCRIPTION_CANCEL events. The endpoint URLS for these are
+
+SUBSCRIPTION_ORDER:
+
+{applicationHost}:{applicationPort}/ad/events/subscription/order?eventUrl={eventUrl}
+
+SUBSCRIPTION_CANCEL:
+
+{applicationHost}:{applicationPort}/ad/events/subscription/cancel?eventUrl={eventUrl}

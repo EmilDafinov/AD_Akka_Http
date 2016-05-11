@@ -6,6 +6,7 @@ import com.emiliorodo.ad.AkkaDependenciesModule
 import com.emiliorodo.ad.api.integration.dao.SubscriptionDaoModule
 import com.emiliorodo.ad.db.DatabaseModule
 import akka.http.scaladsl.marshallers.xml.ScalaXmlSupport._
+import com.emiliorodo.ad.api.ADApiException
 /**
   * @author edafinov
   */
@@ -18,17 +19,17 @@ trait SubscriptionRoutes {
       cancelSubscription(eventUrl) ~
         path("change") {
           complete {
-            "Subscription Changed"
+            throw new ADApiException(errorMessage = "Route not implemented")
           }
         } ~
         path("assign") {
           complete {
-            "Subscription Assigned"
+            throw new ADApiException(errorMessage = "Route not implemented")
           }
         } ~
         path("update") {
           complete {
-            "Subscription Updated"
+            throw new ADApiException(errorMessage = "Route not implemented")
           }
         }
     }
@@ -38,7 +39,7 @@ trait SubscriptionRoutes {
       complete {
         val resp = for {
         //TODO: Remove the second argument, it is there to ensure a mock response is generated for the call
-          accountIdToCancel <- subscriptionEventDao.getCancelSubscriptionEvent(eventUrl, subscriptionEventDao.mockCancelSubscriptionResponseResolver)
+          accountIdToCancel <- subscriptionEventDao.getCancelSubscriptionEvent(eventUrl/*, subscriptionEventDao.mockCancelSubscriptionResponseResolver*/)
           cancelledSubscriptionId <- subscriptionDao.cancelSubscription(accountIdToCancel)
         } yield None
         resp map SuccessfulNonInteractiveResponse("Subscription Cancelled")
@@ -51,12 +52,11 @@ trait SubscriptionRoutes {
       complete {
 
         //TODO: Remove the second argument, it is there to ensure a mock response is generated for the call
-        val processedOrderAccountId = for {
-          subscriptionOrder <- subscriptionEventDao.getSubscriptionOrderEvent(eventUrl, subscriptionEventDao.mockSubscriptionOrderResponseResolver)
-
+        val subscriptionOrderAccountId = for {
+          subscriptionOrder <- subscriptionEventDao.getSubscriptionOrderEvent(eventUrl/*, subscriptionEventDao.mockSubscriptionOrderResponseResolver*/)
           accountIdentifier <- subscriptionDao.createSubscription(subscriptionOrder)
         } yield Option(accountIdentifier)
-        processedOrderAccountId map SuccessfulNonInteractiveResponse("Account creation successful")
+        subscriptionOrderAccountId map SuccessfulNonInteractiveResponse("Account creation successful")
       }
     }
   }

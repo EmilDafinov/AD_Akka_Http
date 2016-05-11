@@ -7,6 +7,9 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import com.emiliorodo.ad.readResourceFile
 import com.emiliorodo.ad.security.OAuthTool
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.when
+import org.mockito.Matchers.{eq => mockEq, any}
 
 import scala.language.postfixOps
 /**
@@ -43,5 +46,55 @@ class SubscriptionEventDaoTest extends UnitTestSpec {
     )
   }
 
+  it should "sign order requests" in {
+    //Given
+    val mockResponse = readResourceFile("/SubscriptionOrder.xml")
+    var actualEventURLCalled = ""
+    val mockResponseResolver: String => Future[String] = {
+      url => {
+        actualEventURLCalled = url
+        Future{mockResponse}
+      }
+    }
+    val mockEventUrl = "mockUrl"
+    val mockSignedEventUrl = "signedMockEvent"
 
+    when(mockSigner.sign(mockEq(mockEventUrl)))
+      .thenReturn(mockSignedEventUrl)
+
+    //When
+    Await.result(
+      testedSubscriptionDao.getSubscriptionOrderEvent(mockEventUrl, mockResponseResolver),
+      Duration.Inf
+    )
+
+    //Then
+    actualEventURLCalled shouldEqual mockSignedEventUrl
+  }
+
+  it should "sign order cancel requests" in {
+    //Given
+    val mockResponse = readResourceFile("/SubscriptionOrder.xml")
+    var actualEventURLCalled = ""
+    val mockResponseResolver: String => Future[String] = {
+      url => {
+        actualEventURLCalled = url
+        Future{mockResponse}
+      }
+    }
+    val mockEventUrl = "mockUrl"
+    val mockSignedEventUrl = "signedMockEvent"
+
+    when(mockSigner.sign(mockEq(mockEventUrl)))
+      .thenReturn(mockSignedEventUrl)
+
+    //When
+    Await.result(
+      testedSubscriptionDao.getCancelSubscriptionEvent(mockEventUrl, mockResponseResolver),
+      Duration.Inf
+    )
+
+    //Then
+    actualEventURLCalled shouldEqual mockSignedEventUrl
+  }
 }

@@ -13,7 +13,7 @@ class OAuthToolTest extends UnitTestSpec {
   val consumerSecret = "consumer_secret"
   val testedOauthTool = new OAuthTool(consumerKey, consumerSecret)
 
-  it should "fsdf" in {
+  it should "dummy test, serves to debug the oauth behavior" in {
     //Given
     val dummyUrl = "http://dummy.com"
 
