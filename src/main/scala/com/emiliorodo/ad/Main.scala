@@ -4,7 +4,7 @@ import akka.http.scaladsl.Http
 import com.emiliorodo.ad.api.integration.dao.SubscriptionDaoModule
 import com.emiliorodo.ad.configuration.ApplicationConfigurationModule
 import com.emiliorodo.ad.db.DatabaseModule
-import com.emiliorodo.ad.server.{ADIntegrationRoutesModule, HttpServerModule, MainRoutesModule}
+import com.emiliorodo.ad.server._
 import com.typesafe.scalalogging.StrictLogging
 
 import scala.util.{Failure, Success}
@@ -12,11 +12,15 @@ import scala.util.{Failure, Success}
 /**
   * @author edafinov
   */
+// AR: What is purpose of using traits composition here?
+// ED: Dependency injection: the root application context should only load the required modules
 trait ApplicationContext extends StrictLogging
   with ApplicationConfigurationModule
   with AkkaDependenciesModule
   with SubscriptionDaoModule
   with DatabaseModule
+  with SubscriptionRoutes
+  with UserAssignmentRoutes
   with ADIntegrationRoutesModule
   with MainRoutesModule
 

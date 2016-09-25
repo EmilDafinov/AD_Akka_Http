@@ -1,16 +1,14 @@
 package com.emiliorodo.ad.api.integration.dao
 
+import com.emiliorodo.ad.resourceString
+import com.emiliorodo.ad.security.OAuthTool
 import com.emiliorodo.ad.util.UnitTestSpec
+import org.mockito.Matchers.{eq => mockEq}
+import org.mockito.Mockito.when
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import com.emiliorodo.ad.readResourceFile
-import com.emiliorodo.ad.security.OAuthTool
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.when
-import org.mockito.Matchers.{eq => mockEq, any}
-
 import scala.language.postfixOps
 /**
   * @author edafinov
@@ -24,7 +22,7 @@ class SubscriptionEventDaoTest extends UnitTestSpec {
   it should "parse the order correctly" in  {
 
     //Given
-    val mockResponse = readResourceFile("/SubscriptionOrder.xml")
+    val mockResponse = resourceString("SubscriptionOrder.xml")
     val mockResponseResolver: String => Future[String] = {_ => Future{mockResponse}}
 
     //When
@@ -48,7 +46,7 @@ class SubscriptionEventDaoTest extends UnitTestSpec {
 
   it should "sign order requests" in {
     //Given
-    val mockResponse = readResourceFile("/SubscriptionOrder.xml")
+    val mockResponse = resourceString("SubscriptionOrder.xml")
     var actualEventURLCalled = ""
     val mockResponseResolver: String => Future[String] = {
       url => {
@@ -74,7 +72,7 @@ class SubscriptionEventDaoTest extends UnitTestSpec {
 
   it should "sign order cancel requests" in {
     //Given
-    val mockResponse = readResourceFile("/SubscriptionOrder.xml")
+    val mockResponse = resourceString("SubscriptionOrder.xml")
     var actualEventURLCalled = ""
     val mockResponseResolver: String => Future[String] = {
       url => {

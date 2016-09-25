@@ -1,0 +1,17 @@
+version: '2'
+services:
+  web:
+    image: ad_akka_http:1.0
+    ports:
+      - "8000:8000"
+    links:
+      - postgres  
+      
+  postgres:
+    image: ad_db:latest
+    ports:
+      - "5432"
+    expose:
+      - 5432
+    environment:
+      POSTGRES_PASSWORD: qwerty

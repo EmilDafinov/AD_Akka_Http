@@ -5,15 +5,15 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import com.emiliorodo.ad.AkkaDependenciesModule
 import com.emiliorodo.ad.api.ADApiException
-import com.emiliorodo.ad.api.integration.dao.SubscriptionDaoModule
-import com.emiliorodo.ad.db.DatabaseModule
 import com.typesafe.scalalogging.StrictLogging
+
+import scala.util.control.NonFatal
 /**
   * @author edafinov
   */
-trait ADIntegrationRoutesModule extends StrictLogging with SubscriptionRoutes with UserAssignmentRoutes {
-  this: SubscriptionDaoModule with AkkaDependenciesModule with DatabaseModule =>
-
+trait ADIntegrationRoutesModule extends StrictLogging  {
+  this: SubscriptionRoutes with UserAssignmentRoutes with AkkaDependenciesModule =>
+  
   lazy val adIntegrationRoutes: Route =
     handleExceptions(adIntegrationRoutesErrorHandler) {
 
@@ -28,8 +28,10 @@ trait ADIntegrationRoutesModule extends StrictLogging with SubscriptionRoutes wi
       complete {
         FailureNonInteractiveResponse(adApiException)
       }
-    case anyOtherException =>
+    case NonFatal(anyOtherException) =>
       logger.error("Client call failed", anyOtherException)
-      complete {FailureNonInteractiveResponse(new ADApiException)}
+      complete {
+        FailureNonInteractiveResponse(new ADApiException)
+      }
   }
 }

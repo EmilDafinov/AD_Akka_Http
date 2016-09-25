@@ -17,7 +17,8 @@ class OAuthTool(consumerKey: String, consumerSecret: String) {
       consumerSecret
     )
 
-    consumer.sign(url)
+//    consumer.sign(url)
+    url
   }
 
   def hasValidSignature(uRI: Uri, urlParams: Map[String, String]) = {

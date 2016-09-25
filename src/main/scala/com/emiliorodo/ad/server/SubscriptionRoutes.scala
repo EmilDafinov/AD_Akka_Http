@@ -14,50 +14,66 @@ trait SubscriptionRoutes {
   this: SubscriptionDaoModule with AkkaDependenciesModule with DatabaseModule =>
 
   lazy val subscriptionEventsRoutes: Route =
-    (pathPrefix("subscription") & parameter("eventUrl") & get) { eventUrl =>
-      createSubscription(eventUrl) ~
-      cancelSubscription(eventUrl) ~
-        path("change") {
-          complete {
-            throw new ADApiException(errorMessage = "Route not implemented")
-          }
-        } ~
-        path("assign") {
-          complete {
-            throw new ADApiException(errorMessage = "Route not implemented")
-          }
-        } ~
-        path("update") {
-          complete {
-            throw new ADApiException(errorMessage = "Route not implemented")
-          }
-        }
+    (pathPrefix("subscription") & parameter("eventUrl") & get) { implicit eventUrl =>
+      order ~
+      cancel ~
+      change ~
+      assign ~
+      update
     }
 
-  def cancelSubscription(eventUrl: String): Route = {
-    path("cancel") {
-      complete {
-        val resp = for {
-        //TODO: Remove the second argument, it is there to ensure a mock response is generated for the call
-          accountIdToCancel <- subscriptionEventDao.getCancelSubscriptionEvent(eventUrl/*, subscriptionEventDao.mockCancelSubscriptionResponseResolver*/)
-          cancelledSubscriptionId <- subscriptionDao.cancelSubscription(accountIdToCancel)
-        } yield None
-        resp map SuccessfulNonInteractiveResponse("Subscription Cancelled")
-      }
-    }
-  }
-
-  def createSubscription(eventUrl: String): Route = {
+  private def order(implicit eventUrl: String): Route = {
     path("order") {
       complete {
 
         //TODO: Remove the second argument, it is there to ensure a mock response is generated for the call
-        val subscriptionOrderAccountId = for {
-          subscriptionOrder <- subscriptionEventDao.getSubscriptionOrderEvent(eventUrl/*, subscriptionEventDao.mockSubscriptionOrderResponseResolver*/)
+        // AR: Why you need Option(accountIdentifier), rather just accountIdentifier?
+        val subscriptionOrderAccountIdFuture = for {
+          subscriptionOrder <- subscriptionEventDao.getSubscriptionOrderEvent(eventUrl, subscriptionEventDao.mockSubscriptionOrderResponseResolver)
           accountIdentifier <- subscriptionDao.createSubscription(subscriptionOrder)
-        } yield Option(accountIdentifier)
-        subscriptionOrderAccountId map SuccessfulNonInteractiveResponse("Account creation successful")
+        } yield accountIdentifier
+        
+        subscriptionOrderAccountIdFuture map SuccessfulNonInteractiveResponse("Account creation successful")
+
       }
     }
   }
+
+  private def cancel(implicit eventUrl: String): Route = {
+    path("cancel") {
+      complete {
+        val accountIdToCancel = subscriptionEventDao.getCancelSubscriptionEvent(eventUrl, subscriptionEventDao.mockCancelSubscriptionResponseResolver)
+        accountIdToCancel foreach subscriptionDao.cancelSubscription
+         
+          UnidentifiedSuccessfulNonInteractiveResponse("Subscription Cancelled")
+      }
+    }
+  }
+  
+  private def update: Route = {
+    path("update") {
+      complete {
+        throw ADApiException(errorMessage = "Route not implemented")
+      }
+    }
+  }
+
+  private def assign: Route = {
+    path("assign") {
+      complete {
+        throw ADApiException(errorMessage = "Route not implemented")
+      }
+    }
+  }
+
+  private def change: Route = {
+    path("change") {
+      complete {
+        throw ADApiException(errorMessage = "Route not implemented")
+      }
+    }
+  }
+
+  
+
 }

@@ -9,16 +9,26 @@ import com.emiliorodo.ad.api.ADApiException
   */
 trait UserAssignmentRoutes {
   val userAssignmentRoutes: Route =
+    // AR: eventUrl must be valid URL, could we validate that? 
     (pathPrefix("user") & parameter("eventUrl") & get) { eventUrl =>
-        path("assign") {
-          complete {
-            throw new ADApiException(errorMessage = "Route not implemented")
-          }
-        } ~
-        path("unassign") {
-          complete {
-            throw new ADApiException(errorMessage = "Route not implemented")
-          }
-        }
+        assign ~
+        unassign
     }
+
+  def unassign: Route = {
+    path("unassign") {
+      complete {
+        throw ADApiException(errorMessage = "Route not implemented")
+      }
+    }
+  }
+
+  private def assign: Route = {
+    path("assign") {
+      // AR: 
+      complete {
+        throw ADApiException(errorMessage = "Route not implemented")
+      }
+    }
+  }
 }

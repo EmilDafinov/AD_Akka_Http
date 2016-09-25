@@ -1,13 +1,16 @@
 package com.emiliorodo
 
-import scala.io.Source
+import com.google.common.base.Charsets.UTF_8
+import com.google.common.io.Resources.{getResource, toString => asString}
+
+import scala.language.postfixOps
 
 /**
   * @author edafinov
   */
 package object ad {
 
-  def readResourceFile(testResource: String): String = {
-    Source.fromURL(getClass.getResource(testResource)) mkString
+  def resourceString(testResource: String): String = {
+    asString(getResource(testResource), UTF_8)
   }
 }

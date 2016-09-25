@@ -31,8 +31,9 @@ class SubscriptionDao(db: Database) extends StrictLogging {
          WHERE account_identifier = '#$accountIdToCancel'
          """.asUpdate
     ) map { deletedRecords =>
+      // AR: Why do use exceptions here?
       if (deletedRecords == 0)
-        throw new ADApiException(
+        throw ADApiException(
           errorCode = AccountNotFound,
           errorMessage = "The subscription's account Identifier was not found"
         )
@@ -49,8 +50,9 @@ class SubscriptionDao(db: Database) extends StrictLogging {
          RETURNING account_identifier;
          """.as[String]
     ) map(_.head) recover {
+      // AR: ADApiException is used in a data access storage class?
       case dbException :PSQLException if dbException.getSQLState == "23505"=>
-        throw new ADApiException(errorCode = UserAlreadyExists, errorMessage = "Account already exists")
+        throw ADApiException(errorCode = UserAlreadyExists, errorMessage = "Account already exists")
     }
   }
 }

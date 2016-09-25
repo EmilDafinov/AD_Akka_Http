@@ -1,6 +1,6 @@
 package com.emiliorodo.ad.api.integration.dao
 
-import com.emiliorodo.ad.readResourceFile
+import com.emiliorodo.ad.resourceString
 import com.emiliorodo.ad.security.OAuthTool
 import dispatch._
 
@@ -10,18 +10,19 @@ import scala.xml.XML
 /**
   * @author edafinov
   */
+// AR: this is DAO access layer, what is relationship between persistent storage and OAuthTool?
 class SubscriptionEventDao(signer: OAuthTool)(implicit ec: ExecutionContext) {
 
   val mockSubscriptionOrderResponseResolver: String => Future[String] = {
-    url => Future {
-      readResourceFile("/mockADResponses/MockSubscriptionOrder.xml")
-    }
+    url => Future.successful(
+      resourceString("mockADResponses/MockSubscriptionOrder.xml")
+    )
   }
 
   val mockCancelSubscriptionResponseResolver: String => Future[String] = {
-    url => Future {
-      readResourceFile("/mockADResponses/MockCancelSubscription.xml")
-    }
+    url => Future.successful(
+      resourceString("mockADResponses/MockCancelSubscription.xml")
+    )
   }
 
   def getSubscriptionOrderEvent(eventUrl: String,
@@ -32,6 +33,7 @@ class SubscriptionEventDao(signer: OAuthTool)(implicit ec: ExecutionContext) {
     resolveRequest(signedUrl) map toParsedSubscriptionOrder
   }
 
+  // AR: this is DAO access layer, what is relationship between persistent storage and response body?
   private def toParsedSubscriptionOrder(responseBody: String): SubscriptionOrder = {
     val xmlResponseBody = XML.loadString(responseBody)
     val creatorElement = xmlResponseBody \ "creator"
@@ -57,7 +59,7 @@ class SubscriptionEventDao(signer: OAuthTool)(implicit ec: ExecutionContext) {
   }
 
   def getCancelSubscriptionEvent(eventUrl: String,
-                                 resolveRequest: String => Future[String] = eventUrl => Http(url(eventUrl).GET OK as.String)) = {
+                                 resolveRequest: String => Future[String] = eventUrl => Http(url(eventUrl).GET OK as.String)): Future[String] = {
 
     val signedUrl = signer.sign(eventUrl)
     resolveRequest(signedUrl) map toParsedAccountIdentifier
